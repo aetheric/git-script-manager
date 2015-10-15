@@ -1,74 +1,74 @@
 #!/bin/sh
 
-loc="$( cd "$( dirname "${BASEH_SOURCE[0]}" )" && pwd )"
+loc="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-command="$1"
+# ===== FUNCTION DEFINITIONS =================
 
-# arguments now don't include command.
-shift 1
-
-case "$command" in
-
-	get)   exit get();;
-
-	on)	   exit on();;
-
-	off)   exit off();;
-
-	purge) exit purge();;
-
-	list)  exit list();;
-
-	*)
-		echo "Unknown command $1."
-		exit 1
-	;;
-
-esac
-
-# git scripts fetch tzrlk/git-extras git-switch
+# git scripts get tzrlk/git-extras git-switch
 function get {
 
-	echo "Retrieving ${1}@${2} from github..."
-	repo_dir="${loc}/../repos/${1}/.git"
+	reponame=$1
+	branchname=$2
+
+	if [ -z "$1" ]; then
+		echo "You need to specify a github user/repo to fetch"
+		return 1
+	fi
+
+	if [ -z "$2" ]; then
+		echo "You should really pick a tagged release to use."
+		echo "We'll just use master for the time being, however"
+		branchname=master
+	fi
+
+	echo "Retrieving ${reponame}@${branchname} from github..."
+	repo_dir="${loc}/../repos/${reponame}/.git"
 	
 	#check if not cloned.
 	if [ ! -d "$repo_dir/.git" ]; then
-		mkdir $repo_dir
+		mkdir -p $repo_dir
 		git -C $repo_dir init
-		git -C $repo_dir remote add origin https://github.com/${1}.git
+		git -C $repo_dir remote add origin https://github.com/${reponame}.git
 	fi
 
 	echo Retrieving latest updates
 	git -C $repo_dir fetch origin --prune
 
-	echo Checking-out ${2}...
-	git -C $repo_dir checkout $2
+	echo Checking-out ${branchname}...
+	git -C $repo_dir checkout $branchname
 
 }
 
 # git scripts activate tzrlk/git-extras git-switch git-switch
 function on {
 
-	echo Creating symlink for ${loc}/../repos/$1/$2 to ${loc}/$3
-	ln -s "${loc}/../repos/$1/$2" $3
+	reponame=$1
+	scriptpath=$2
+	scriptname=$3
+
+	echo Creating symlink for ${loc}/../repos/$reponame/$scriptpath to ${loc}/$scriptname
+	ln -s "${loc}/../repos/$reponame/$scriptpath" $scriptname
 
 }
 
 # git scripts deactivate git-switch
 function off {
+
+	scriptname=$1
 	
-	echo Removing ${1} from active scripts
-	rm -f "${loc}/${1}"
+	echo Removing ${scriptname} from active scripts
+	rm -f "${loc}/${scriptname}"
 
 }
 
 # git scripts purge tzrlk/git-extras
 function purge {
 
-	repo_dir="${loc}/../repos/${1}/.git"
+	reponame=$1
 
-	echo Removing ${1} from stored repos
+	repo_dir="${loc}/../repos/${reponame}/.git"
+
+	echo Removing ${reponame} from stored repos
 	rm -rf $repo_dir
 
 }
@@ -77,10 +77,44 @@ function purge {
 function list {
 
 	echo Listing all stored repos.
-	ls "${loc}/../repos"
+	ls -R "${loc}/../repos"
 
 	echo Listing all active scripts.
 	ls "${loc}"
 
 }
+
+case "$1" in
+
+	get)
+		get $2 $3
+		exit $?
+		;;
+
+	on)
+		on $2 $3 $4
+		exit $?
+		;;
+
+	off)
+		off $2
+		exit $?
+		;;
+
+	purge)
+		purge $2
+		exit $?
+		;;
+
+	list)
+		list
+		exit $?
+		;;
+
+	*)
+		echo "Unknown command $1. Available commands: get, on, off, purge, list"
+		exit 1
+	;;
+
+esac
 

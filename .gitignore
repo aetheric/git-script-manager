@@ -1,1 +1,5 @@
 repos/
+bin/
+!bin/git-scripts
+*.log
+
