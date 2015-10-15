@@ -28,36 +28,59 @@ esac
 
 # git scripts fetch tzrlk/git-extras git-switch
 function get {
-	echo "Retrieving ${1}@${2} from github..."
-	
-	#check if already cloned; if so, pull.
 
-	#otherwise
-	git clone https://github.com/$1.git $loc/../repos/$1
+	echo "Retrieving ${1}@${2} from github..."
+	repo_dir="${loc}/../repos/${1}/.git"
+	
+	#check if not cloned.
+	if [ ! -d "$repo_dir/.git" ]; then
+		mkdir $repo_dir
+		git -C $repo_dir init
+		git -C $repo_dir remote add origin https://github.com/${1}.git
+	fi
+
+	echo Retrieving latest updates
+	git -C $repo_dir fetch origin --prune
+
+	echo Checking-out ${2}...
+	git -C $repo_dir checkout $2
 
 }
 
 # git scripts activate tzrlk/git-extras git-switch git-switch
 function on {
-	# symlink script in repo to /bin dir
+
+	echo Creating symlink for ${loc}/../repos/$1/$2 to ${loc}/$3
+	ln -s "${loc}/../repos/$1/$2" $3
+
 }
 
 # git scripts deactivate git-switch
 function off {
-	# remove symlink in /bin
+	
+	echo Removing ${1} from active scripts
+	rm -f "${loc}/${1}"
+
 }
 
 # git scripts purge tzrlk/git-extras
 function purge {
 
-	# remove repo and all related symlinks
+	repo_dir="${loc}/../repos/${1}/.git"
+
+	echo Removing ${1} from stored repos
+	rm -rf $repo_dir
 
 }
 
 # git scripts list
 function list {
 
-	# list all repos with their commands and whether they're active.
+	echo Listing all stored repos.
+	ls "${loc}/../repos"
+
+	echo Listing all active scripts.
+	ls "${loc}"
 
 }
 
