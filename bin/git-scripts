@@ -1,6 +1,8 @@
 #!/bin/sh
 
 loc="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+repodir=$HOME/.git/script-repos
+bindir=$HOME/.git/script-bin
 
 # ===== FUNCTION DEFINITIONS =================
 
@@ -22,7 +24,7 @@ function get {
 	fi
 
 	echo "Retrieving ${reponame}@${branchname} from github..."
-	repo_dir="${loc}/../repos/${reponame}/.git"
+	repo_dir="${repodir}/${reponame}"
 	
 	#check if not cloned.
 	if [ ! -d "$repo_dir/.git" ]; then
@@ -46,8 +48,9 @@ function on {
 	scriptpath=$2
 	scriptname=$3
 
-	echo Creating symlink for ${loc}/../repos/$reponame/$scriptpath to ${loc}/$scriptname
-	ln -s "${loc}/../repos/$reponame/$scriptpath" $scriptname
+	mkdir -p ${bindir}
+	echo Creating symlink for ${repodir}/$reponame/$scriptpath to ${bindir}/$scriptname
+	ln -s "${repodir}/$reponame/$scriptpath" ${bindir}/$scriptname
 
 }
 
@@ -57,7 +60,7 @@ function off {
 	scriptname=$1
 	
 	echo Removing ${scriptname} from active scripts
-	rm -f "${loc}/${scriptname}"
+	rm -f "${bindir}/${scriptname}"
 
 }
 
@@ -66,7 +69,7 @@ function purge {
 
 	reponame=$1
 
-	repo_dir="${loc}/../repos/${reponame}/.git"
+	repo_dir="${repodir}/${reponame}/.git"
 
 	echo Removing ${reponame} from stored repos
 	rm -rf $repo_dir
@@ -77,10 +80,10 @@ function purge {
 function list {
 
 	echo Listing all stored repos.
-	ls -R "${loc}/../repos"
+	ls -R "${repodir}"
 
 	echo Listing all active scripts.
-	ls "${loc}"
+	ls "${bindir}"
 
 }
 
