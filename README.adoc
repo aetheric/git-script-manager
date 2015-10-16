@@ -18,21 +18,12 @@ e.g. git scripts get tzrlk/git-extras master
 
 NOTE: If the last argument is omitted, it will default to 'master'
 
-TODO: Remove reliance on github.
-
 === on
 
 Selects a particular script and symlinks it into the ~/.git/script-bin
 directory for use.
 
 e.g. git scripts on tzrlk/git-extras bin/git-ignore git-ignore
-
-TODO: Make the last argument optional
-
-TODO: Automatically 'get' repo if not alread fetched (only with option)
-
-TODO: Add recursive searching for scripts so the subdir doesn't need to be
-specified.
 
 === off
 
@@ -46,16 +37,12 @@ Removes a script repo and all associated activated scripts.
 
 e.g. git scripts purge tzrlk/git-extras
 
-TODO: Make this more than an rm -rf on the repo dir. Should clean-up symlinks.
-
 === list
 
 Lists all the script repos, their scripts, and whether they are activated or
 not.
 
 e.g. git scripts list
-
-TODO: Actually add recursive script search and matching. Ugh.
 
 == Installation
 
