@@ -6,6 +6,20 @@ bindir=$HOME/.git/script-bin
 
 # ===== FUNCTION DEFINITIONS =================
 
+function beginswith() {
+	case $2 in
+
+		$1*)
+			return 1
+			;;
+
+		*)
+			return 0
+			;;
+
+	esac;
+}
+
 # git scripts get tzrlk/git-extras git-switch
 function get {
 
@@ -48,9 +62,29 @@ function on {
 	scriptpath=$2
 	scriptname=$3
 
-	mkdir -p ${bindir}
-	echo Creating symlink for ${repodir}/$reponame/$scriptpath to ${bindir}/$scriptname
-	ln -s "${repodir}/$reponame/$scriptpath" ${bindir}/$scriptname
+	source=$repodir/$reponame/$scriptpath
+
+	if [ -z "$scriptname" ]; then
+		scriptname=`basename ${source}`
+		echo Assuming script is called $scriptname.
+	fi
+
+	if beginswith "git-" "$scriptname"; then
+		echo The script name \($scriptname\) you\'re using doesn\'t start with \'git-\'!
+		return 1
+	fi
+
+	mkdir -p $bindir
+
+	target=$bindir/$scriptname
+
+	if [ -e "$target" -o -h "$target" ]; then
+		echo Script already exists. Will overwrite.
+		rm -f $target
+	fi
+
+	echo Creating symlink for $source to $target
+	ln -s $source $target
 
 }
 
