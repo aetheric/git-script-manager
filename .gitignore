@@ -1,5 +1,11 @@
 repos/
-bin/
-!bin/git-scripts
 *.log
 
+# Gradle
+.gradle/
+gradle/
+build/
+
+# IntelliJ
+.idea/
+*.iml

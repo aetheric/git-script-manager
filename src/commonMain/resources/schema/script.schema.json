@@ -1,0 +1,21 @@
+{
+	"$schema": "http://json-schema.org/draft/2019-09/schema",
+	"$id": "https://aetheric.co.nz/schema/gsm/script",
+	"type": "object",
+	"required": [
+		"path"
+	],
+	"properties": {
+
+		"alias": {
+			"type":        "string",
+			"description": "A name that can be used to expose the script as a command."
+		},
+
+		"path": {
+			"type":        "string",
+			"description": "The path within the hosting repository it can be found at."
+		}
+
+	}
+}

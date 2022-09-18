@@ -1,0 +1,9 @@
+{
+	"targetLanguage": "kotlin",
+	"packageName": "nz.co.aetheric.gsm.data",
+	"annotations": {
+		"classes": {
+			"kotlinx.serialization.Serializable": null
+		}
+	}
+}
