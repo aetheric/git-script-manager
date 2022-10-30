@@ -3,7 +3,15 @@
 	"packageName": "nz.co.aetheric.gsm.data",
 	"annotations": {
 		"classes": {
-			"kotlinx.serialization.Serializable": null
+			"kotlinx.serialization.Serializable": null,
+			"javax.annotation.Generated": "\"{{&generator}}\", date=\"{{&dateTime}}\""
+		}
+	},
+	"customClasses": {
+		"format": {
+			"map_repos": "nz.co.aetheric.gsm.data.MapOfRepository",
+			"map_scripts": "nz.co.aetheric.gsm.data.MapOfScript",
+			"path": "okio.Path"
 		}
 	}
 }

@@ -7,14 +7,30 @@
 	],
 	"properties": {
 
-		"alias": {
-			"type":        "string",
-			"description": "A name that can be used to expose the script as a command."
+		"path": {
+			"description": "The path within the hosting repository it can be found at.",
+			"type": "string",
+			"format": "path"
 		},
 
-		"path": {
-			"type":        "string",
-			"description": "The path within the hosting repository it can be found at."
+		"resources": {
+			"description": "Any files relative to the script that are required.",
+			"type": "array",
+			"uniqueItems": true,
+			"items": {
+				"type": "string",
+				"format": "path"
+			}
+		},
+
+		"incidentals": {
+			"description": "Files that get created or read by the script during the course of its use.",
+			"type": "array",
+			"uniqueItems": true,
+			"items": {
+				"type": "string",
+				"format": "path"
+			}
 		}
 
 	}

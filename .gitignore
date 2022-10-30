@@ -5,6 +5,7 @@ repos/
 .gradle/
 gradle/
 build/
+*.hprof
 
 # IntelliJ
 .idea/

@@ -2,21 +2,19 @@ import net.pwall.json.kotlin.codegen.gradle.JSONSchemaCodegen
 import net.pwall.json.kotlin.codegen.gradle.JSONSchemaCodegenPlugin
 
 plugins {
-	kotlin("multiplatform") version "1.7.10"
-	kotlin("plugin.serialization") version "1.7.10"
-	id("org.jetbrains.kotlinx.kover") version "0.6.0"
+	kotlin("multiplatform")
+	kotlin("plugin.serialization")
+	id("org.jetbrains.kotlinx.kover")
+	id("io.kotest.multiplatform")
 	application
 }
 
-group   = "nz.co.aetheric"
-version = "0.1.0-SNAPSHOT"
-
 buildscript {
-	repositories {
-		mavenCentral()
-	}
 	dependencies {
-		classpath("net.pwall.json:json-kotlin-gradle:0.81")
+		// https://github.com/pwall567/json-kotlin-gradle
+		classpath("net.pwall.json", "json-kotlin-gradle", "0.83") {
+			exclude("org.jetbrains.kotlin", "kotlin-gradle-plugin-api")
+		}
 	}
 }
 
@@ -24,49 +22,60 @@ apply<JSONSchemaCodegenPlugin>()
 
 repositories {
 	mavenCentral()
+	jcenter()
+//	maven("https://dl.bintray.com/ricky12awesome/github")
 }
 
+group   = "nz.co.aetheric"
+version = "0.1.0-SNAPSHOT"
+
 kotlin {
-	linuxX64("nix") {
-		binaries {
-			executable {
-				entryPoint = "main"
-			}
-		}
-	}
-	mingwX64("win") {
-		binaries {
-			executable {
-				entryPoint = "main"
-			}
-		}
-	}
+	listOf( linuxX64("nix"), mingwX64("win"), macosX64("mac") )
+		.forEach { it.binaries { executable {  entryPoint = "nz.co.aetheric.gsm.main"  }} }
 	jvm {
+		withJava()
 		compilations.all {
 			kotlinOptions.jvmTarget = "11"
 		}
-		withJava()
 		testRuns["test"].executionTask.configure {
 			useJUnitPlatform()
 		}
 	}
-	macosX64("mac") {
-		binaries {
-			executable {
-				entryPoint = "main"
-			}
-		}
-	}
 	sourceSets {
+		val mockkVersion: String by project
+		val kotlinCliVersion: String by project
+		val kotlinJsonVersion: String by project
+		val koinVersion: String by project
+		val atriumVersion: String by project
+		val flowExtVersion: String by project
+		val coroutinesVersion: String by project
+		val okioVersion: String by project
+		val cliktVersion: String by project
+		val kotestVersion: String by project
+		val kotestKoinVersion: String by project
 		val commonMain by getting {
 			kotlin.srcDir("build/generated-sources/kotlin")
 			dependencies {
 
-				// https://github.com/Kotlin/kotlinx-cli
-				implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
+				// https://ajalt.github.io/clikt/
+				implementation("com.github.ajalt.clikt:clikt:${cliktVersion}")
 
 				// https://github.com/Kotlin/kotlinx.serialization
-				implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+				implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlinJsonVersion}")
+
+				// https://insert-koin.io
+				implementation("io.insert-koin:koin-core:${koinVersion}")
+
+				// https://square.github.io/okio/multiplatform/
+				implementation("com.squareup.okio:okio:${okioVersion}")
+
+				// https://github.com/Ricky12Awesome/json-schema-serialization
+//				implementation("com.github.Ricky12Awesome:json-schema-serialization:0.6.6")
+
+				// https://github.com/petertrr/kotlin-multiplatform-diff
+				// https://docs.korge.org/krypto
+				// https://github.com/z4kn4fein/kotlin-semver
+				// https://github.com/Kotlin/kotlinx-datetime
 
 			}
 			configure<JSONSchemaCodegen> {
@@ -76,19 +85,16 @@ kotlin {
 				}
 			}
 		}
-		val commonTest by getting
-		val nixMain by getting
-		val nixTest by getting
-		val winMain by getting
-		val winTest by getting
-		val jvmMain by getting
-		val jvmTest by getting {
+		val commonTest by getting {
 			dependencies {
-				implementation(kotlin("test"))
+				implementation("io.kotest:kotest-framework-engine:${kotestVersion}")
+				implementation("io.kotest:kotest-assertions-core:${kotestVersion}")
+				implementation("io.kotest:kotest-property:${kotestVersion}")
+				implementation("io.insert-koin:koin-test:${koinVersion}") {
+					exclude("junit", "junit") }
+				implementation("com.squareup.okio:okio-fakefilesystem:${okioVersion}")
 			}
 		}
-		val macMain by getting
-		val macTest by getting
 	}
 }
 

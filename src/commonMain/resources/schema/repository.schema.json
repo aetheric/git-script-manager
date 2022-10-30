@@ -3,16 +3,10 @@
 	"$id": "https://aetheric.co.nz/schema/gsm/repository",
 	"type": "object",
 	"required": [
-		"alias",
 		"source",
 		"reference"
 	],
 	"properties": {
-
-		"alias": {
-			"type": "string",
-			"description": "The name that this repo is referred to with."
-		},
 
 		"source": {
 			"type": "string",
@@ -26,10 +20,10 @@
 		},
 
 		"scripts": {
-			"description": "A list of the scripts identified in this repository.",
-			"type": "array",
-			"default": [],
-			"items": {
+			"description": "A map of the scripts identified in this repository.",
+			"type": "object",
+			"format": "map_scripts",
+			"additionalProperties": {
 				"$ref": "https://aetheric.co.nz/schema/gsm/script"
 			}
 		}

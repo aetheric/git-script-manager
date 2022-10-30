@@ -1,0 +1,32 @@
+{
+	"$schema": "http://json-schema.org/draft/2019-09/schema",
+	"$id": "https://aetheric.co.nz/schema/gsm/settings",
+	"description": "Configuration for the Git Script Manager application.",
+	"type": "object",
+	"required": [
+	],
+	"properties": {
+
+		"cacheDir": {
+			"description": "Where the contents of the script repositories get put",
+			"type": "string",
+			"format": "path"
+		},
+
+		"binDir": {
+			"description": "The directory that the scripts get exposed on.",
+			"type": "string",
+			"format": "path"
+		},
+
+		"repositories": {
+			"description": "The list of repositories being sourced.",
+			"type": "object",
+			"format": "map_repos",
+			"additionalProperties": {
+				"$ref": "https://aetheric.co.nz/schema/gsm/repository"
+			}
+		}
+
+	}
+}
