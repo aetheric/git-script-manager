@@ -1,39 +1,59 @@
-//package nz.co.aetheric.gsm.cmds
-//
-//import com.github.ajalt.clikt.core.CliktCommand
-//import com.github.ajalt.clikt.core.PrintHelpMessage
-//import com.github.ajalt.clikt.core.subcommands
-//import io.mockk.mockkClass
-//import okio.fakefilesystem.FakeFileSystem
-//
-//// https://ajalt.github.io/clikt/advanced/#testing-your-clikt-cli
-//@DisplayName("GsmRepo")
-//class GsmRepoTest {
-//	val target = GsmRepo()
-//	val files = target.currentContext.findOrSetObject { FakeFileSystem() }
-//
-//	@AfterEach
-//	fun tearDown() {
-//		files.checkNoOpenFiles()
-//	}
-//
-//	@Test
-//	@DisplayName("when given no arguments")
-//	fun testParseNothing() {
-//		assertThrows<PrintHelpMessage>("should print the help message.") {
-//			target.parse(listOf())
-//		}
-//	}
-//
-//	@Test
-//	@DisplayName("when given a subcommand")
-//	fun testParseRepo() {
-//		val subcommandName = "repo"
-//		val subcommand = mockkClass(CliktCommand::class, relaxed = true)
-//		assertThrows<PrintHelpMessage>("should print the help message.") {
-//			target.subcommands(subcommand)
-//				.parse(listOf(subcommandName))
-//		}
-//	}
-//
-//}
+package nz.co.aetheric.gsm.cmds
+
+import com.github.ajalt.clikt.core.PrintHelpMessage
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.koin.KoinExtension
+import nz.co.aetheric.TestCommand
+import okio.fakefilesystem.FakeFileSystem
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
+
+// https://ajalt.github.io/clikt/advanced/#testing-your-clikt-cli
+class GsmRepoTest : DescribeSpec(), KoinComponent {
+
+	override fun isolationMode() = IsolationMode.InstancePerTest
+	override fun extensions() = listOf(
+		KoinExtension(module {
+			singleOf(::GsmRepo)
+			singleOf(::FakeFileSystem)
+		}),
+	)
+
+	init {
+		val files: FakeFileSystem by inject()
+
+		beforeAny {
+		}
+
+		afterAny {
+			files.checkNoOpenFiles()
+		}
+
+		describe("a_GsmRepo_cmd_instance") {
+			val target: GsmRepo by inject()
+
+			describe("given_no_arguments") {
+				it("should_print_the_help_message") {
+					shouldThrow<PrintHelpMessage> {
+						target.parse(listOf())
+					}
+				}
+			}
+
+			describe("given_a_subcommand") {
+				val testCmd: TestCommand by inject()
+				it("should_invoke_the_subcommand") {
+					shouldThrow<PrintHelpMessage> {
+						target.parse(listOf(testCmd.commandName))
+					}
+				}
+			}
+
+		}
+
+	}
+}
