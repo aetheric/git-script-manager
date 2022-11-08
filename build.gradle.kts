@@ -1,11 +1,12 @@
 import net.pwall.json.kotlin.codegen.gradle.JSONSchemaCodegen
 import net.pwall.json.kotlin.codegen.gradle.JSONSchemaCodegenPlugin
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-	kotlin("multiplatform")
-	kotlin("plugin.serialization")
-	id("org.jetbrains.kotlinx.kover")
-	id("io.kotest.multiplatform")
+	alias(libs.plugins.kotlin.multiplatform)
+	alias(libs.plugins.kotlin.serialization)
+	alias(libs.plugins.kotest.multiplatform)
+	alias(libs.plugins.kover)
 	application
 }
 
@@ -33,50 +34,19 @@ kotlin {
 	listOf( linuxX64("nix"), mingwX64("win"), macosX64("mac") )
 		.forEach { it.binaries { executable {  entryPoint = "nz.co.aetheric.gsm.main"  }} }
 	jvm {
-		withJava()
-		compilations.all {
-			kotlinOptions.jvmTarget = "11"
-		}
 		testRuns["test"].executionTask.configure {
 			useJUnitPlatform()
 		}
 	}
 	sourceSets {
-		val mockkVersion: String by project
-		val kotlinCliVersion: String by project
-		val kotlinJsonVersion: String by project
-		val koinVersion: String by project
-		val atriumVersion: String by project
-		val flowExtVersion: String by project
-		val coroutinesVersion: String by project
-		val okioVersion: String by project
-		val cliktVersion: String by project
-		val kotestVersion: String by project
-		val kotestKoinVersion: String by project
 		val commonMain by getting {
 			kotlin.srcDir("build/generated-sources/kotlin")
 			dependencies {
-
-				// https://ajalt.github.io/clikt/
-				implementation("com.github.ajalt.clikt:clikt:${cliktVersion}")
-
-				// https://github.com/Kotlin/kotlinx.serialization
-				implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlinJsonVersion}")
-
-				// https://insert-koin.io
-				implementation("io.insert-koin:koin-core:${koinVersion}")
-
-				// https://square.github.io/okio/multiplatform/
-				implementation("com.squareup.okio:okio:${okioVersion}")
-
-				// https://github.com/Ricky12Awesome/json-schema-serialization
-//				implementation("com.github.Ricky12Awesome:json-schema-serialization:0.6.6")
-
-				// https://github.com/petertrr/kotlin-multiplatform-diff
-				// https://docs.korge.org/krypto
-				// https://github.com/z4kn4fein/kotlin-semver
-				// https://github.com/Kotlin/kotlinx-datetime
-
+				implementation(libs.clikt)
+				implementation(libs.kotlinx.serialization.json)
+				implementation(libs.koin.core)
+				implementation(libs.okio)
+//				implementation(libs.json.schema.serialization)
 			}
 			configure<JSONSchemaCodegen> {
 				configFile.set(file("src/commonMain/resources/codegen-config.json"))
@@ -87,12 +57,17 @@ kotlin {
 		}
 		val commonTest by getting {
 			dependencies {
-				implementation("io.kotest:kotest-framework-engine:${kotestVersion}")
-				implementation("io.kotest:kotest-assertions-core:${kotestVersion}")
-				implementation("io.kotest:kotest-property:${kotestVersion}")
-				implementation("io.insert-koin:koin-test:${koinVersion}") {
-					exclude("junit", "junit") }
-				implementation("com.squareup.okio:okio-fakefilesystem:${okioVersion}")
+				implementation(libs.kotest.framework.engine)
+				implementation(libs.kotest.assertions.core)
+				implementation(libs.kotest.property)
+				implementation(libs.koin.test)
+//				implementation(libs.kotest.extensions.koin)
+				implementation(libs.okio.fakefilesystem)
+			}
+		}
+		val jvmTest by getting {
+			dependencies {
+				implementation(libs.kotest.runner.junit5)
 			}
 		}
 	}

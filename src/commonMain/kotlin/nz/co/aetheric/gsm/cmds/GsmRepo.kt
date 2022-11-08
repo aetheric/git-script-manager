@@ -3,6 +3,7 @@ package nz.co.aetheric.gsm.cmds
 import com.github.ajalt.clikt.core.subcommands
 import nz.co.aetheric.cli.CliCmd
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 
 class GsmRepo : CliCmd(
 	name  = "repo",
@@ -11,7 +12,7 @@ class GsmRepo : CliCmd(
 ) {
 
 	// Subcommand injection.
-	private val cmdSet: GsmRepoSet by inject()
+	private val cmdSet by inject<CliCmd>(named("gsm_repo_set"))
 
 	init {
 		subcommands(

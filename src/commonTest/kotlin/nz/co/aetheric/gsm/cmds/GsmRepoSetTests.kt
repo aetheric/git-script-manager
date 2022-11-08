@@ -2,37 +2,37 @@ package nz.co.aetheric.gsm.cmds
 
 import com.github.ajalt.clikt.core.MissingArgument
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.koin.KoinExtension
 import io.kotest.matchers.shouldBe
 import nz.co.aetheric.gsm.data.ConfigScope
+import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.*
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import org.koin.test.KoinTest
 import kotlin.test.assertFalse
 
 // https://ajalt.github.io/clikt/advanced/#testing-your-clikt-cli
-class GsmRepoSetTest : DescribeSpec(), KoinComponent {
+class GsmRepoSetTests : DescribeSpec(), KoinTest {
 
-	override fun isolationMode() = IsolationMode.InstancePerTest
 	override fun extensions() = listOf(
 		KoinExtension(module {
-			singleOf(::GsmRepoSet)
-			singleOf(::FakeFileSystem)
+			singleOf(::GsmRepoSet) { named("gsm_repo_set") }
+			single { FakeFileSystem() } withOptions {
+				bind<FileSystem>()
+			}
 		}),
 	)
 
-	init {
-		val files: FakeFileSystem by inject()
-		val target: GsmRepoSet by inject()
-		val configPath = ConfigScope.USER.locations[0].toPath(true)
+	val target: GsmRepoSet by inject(named("gsm_repo_set"))
+	val files: FakeFileSystem by inject()
 
-		beforeAny {
-		}
+	init {
+		val configPath = ConfigScope.USER.locations[0].toPath(true)
 
 		afterAny {
 			files.checkNoOpenFiles()
@@ -47,7 +47,8 @@ class GsmRepoSetTest : DescribeSpec(), KoinComponent {
 		}
 
 		describe("minimal_arguments") {
-			val testArgs = listOf("butts", "https://github.com/tzrlk/git-utils.git")
+			val repoAlias = "butts"
+			val repoUrl   = "https://github.com/tzrlk/git-utils.git"
 
 			describe("a_config_file_doesnt_already_exist") {
 
@@ -56,9 +57,9 @@ class GsmRepoSetTest : DescribeSpec(), KoinComponent {
 				}
 
 				it("should_create_the_config_file_with_expected_content") {
-					target.parse(testArgs)
+					target.parse(listOf(repoAlias, repoUrl))
 					files.exists(configPath) shouldBe true
-					files.read(configPath) { readUtf8() } shouldBe "{}"
+					files.read(configPath) { readUtf8() } shouldBe "{\"repositories\":{\"${repoAlias}\":{\"source\":\"${repoUrl}\"}}}"
 				}
 
 			}

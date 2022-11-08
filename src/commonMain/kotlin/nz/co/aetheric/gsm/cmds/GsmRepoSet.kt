@@ -33,7 +33,7 @@ class GsmRepoSet : CliCmd(
 		help = "Whether config should be saved locally.",
 	).flag("--local")
 
-	private val files : FileSystem by inject()
+	private val files by inject<FileSystem>()
 
 	override fun run() {
 

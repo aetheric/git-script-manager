@@ -32,16 +32,6 @@ abstract class CliCmd(
 	/** Default action for commands is to print help, unless overridden. **/
 	override fun run(): Unit = throw PrintHelpMessage(this, false)
 
-	/**
-	 * If a Koin instance is supplied, use that. Otherise, try to find one in
-	 * the context hierarchy. If that fails, fall back to the global
-	 * definition.
-	 * @return the "closest" instance of Koin.
-	 * @throws NullPointerException if called before `main` or `parse`, due to
-	 *         access of `currentContext`.
-	 */
-	override fun getKoin(): Koin = currentContext.findOrSetObject { super.getKoin() }
-
 	enum class Opt {
 		ARGS_REQUIRED,
 		ARGS_TOLERANT,
